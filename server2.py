@@ -13,8 +13,10 @@ class server:
         found_files = ""
         for client in self.files:
             for f in self.files[client]:
-                if(data[1] in f):
-                    found_files += f + " " + client + " " + self.clients[client]['port']
+                if(name in f):
+                    found_files += f + " " + str(client[0]) + " " + str(self.clients[client]['port']) + ","
+        if(found_files[-1:] == ','):
+            found_files = found_files[:-1]
         found_files += '\n'
         return found_files
     
@@ -25,13 +27,11 @@ class server:
         while True:
 
             client_socket, client_address = self.server.accept()
-            self.clients[client_address]['socket'] = client_socket
+            self.clients[client_address] = { 'socket' : client_socket }
             data = client_socket.recv(1024).split(' ')
-
             if(data[0] == '1'): #Register and share files
                 #Save client socket & port
-                self.clients[client_address]['socket'] = client_socket
-                self.clients[client_socket]['port'] = data[1]
+                self.clients[client_address]['port'] = int(data[1])
                 files = data[2].split(',')
                 #Save client files
                 self.files[client_address] = files
